@@ -1,0 +1,263 @@
+﻿@model LTSMerchWebApp.Models.Product
+<!-- Modal de confirmación de producto agregado -->
+<div id="productAddedModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5>AGREGAR</h5>
+        </div>
+
+        <div class="modal-body">
+            <i class="fa-solid fa-circle-check icon-large" style="color: #000000;"></i>
+            <div class="modal-text">
+            <h2>Producto agregado</h2>
+            <p>Producto agregado correctamente</p>
+            </div>
+            <div class="sidebar-footer">
+            <button onclick="closeModal()">ACEPTAR</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Sidebar de Agregar Producto -->
+<div id="addProductSidebar" class="sidebar">
+    <div class="sidebar-header">
+        <h5>AGREGAR</h5>
+        <button type="button" class="close-btn" onclick="closeSidebar()">×</button>
+    </div>
+    <div class="sidebar-content">
+        <form id="addProductForm" asp-action="Create" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="productName">Nombre del producto</label>
+                <input type="text" class="form-control" id="productName" placeholder="Ingresar nombre del producto" asp-for="Name" maxlength="100" required>
+            </div>
+            <div class="form-group">
+                <label for="productPrice">Precio unitario</label>
+                <input type="number" min="0.01" max="999999.99" step="0.01" class="form-control" id="productPrice" placeholder="Ingresar precio del producto" asp-for="Price" required>
+            </div>
+            <div class="form-group">
+                <label for="productDescription">Descripción</label>
+                <textarea class="form-control" id="productDescription" rows="3" placeholder="Ingresar descripción del producto" asp-for="Description" maxlength="300" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Combinaciones de Categoría, Color y Talla</label>
+                <div id="combinationContainer">
+                    <div class="combination-row">
+                        <div class="form-group">
+                            <label for="productCategory">Categoría</label>
+                            <select class="form-control" name="CategoryIds" asp-items="ViewBag.Categories" required>
+                                <option value="">Seleccione una categoría</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="productColor">Color</label>
+                            <select class="form-control" name="ColorIds" asp-items="ViewBag.Colors" required>
+                                <option value="">Seleccione un color</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="productSize">Talla</label>
+                            <select class="form-control" name="SizeIds" asp-items="ViewBag.Sizes" required>
+                                <option value="">Seleccione una talla</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="addCombination()">Agregar otra combinación</button>
+            </div>
+
+            <div class="form-group">
+                <label for="productStock">Stock</label>
+                <input type="number" name="Stock" class="form-control" min="0" max="999999" placeholder="Ingresar el stock" required>
+            </div>
+
+
+            <div class="form-group">
+                <label for="productState">Estado</label>
+                <select class="form-control" name="StateId" asp-items="ViewBag.States" required>
+                    <option value="">Seleccione el estado</option>
+                </select>
+            </div>
+            <div class="form-group file-upload-wrapper">
+                <label for="file-upload-input">Imagen</label>
+                <div class="file-upload-controls">
+                    <label class="file-upload-btn" for="file-upload-input">Subir imagen</label>
+                    <input id="file-upload-input" type="file" class="form-control-file" asp-for="ImageUrl"
+                           accept=".jpg, .jpeg, .png"
+                           onchange="validateImage(this)" required>
+                    <span id="file-upload-name" class="file-upload-name">No hay archivo seleccionado</span>
+                </div>
+                <small class="form-text text-muted">* La imagen debe tener 300x300px como mínimo de resolución y estar en formato .jpg o .png.</small>
+            </div>
+
+
+
+            <div class="sidebar-footer">
+                <button id="addProductBtn" type="submit" class="btn btn-primary">Agregar Producto</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function addCombination() {
+        const combinationContainer = document.getElementById("combinationContainer");
+        const newCombination = combinationContainer.children[0].cloneNode(true);
+        combinationContainer.appendChild(newCombination);
+    }
+    // Función para validar la imagen
+    function validateImage(input) {
+        const file = input.files[0];
+        const fileName = file ? file.name : '';
+        const allowedExtensions = ['jpg', 'jpeg', 'png'];
+
+        if (file) {
+            const fileExt = fileName.split('.').pop().toLowerCase();
+
+            // Validar extensión de archivo
+            if (!allowedExtensions.includes(fileExt)) {
+                input.value = ''; 
+                document.getElementById('file-upload-name').textContent = 'Imagen inválida';
+                checkAddFormValidity(); 
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    // Validar tamaño de la imagen
+                    if (img.width < 300 || img.height < 300) {
+                        input.value = ''; 
+                        document.getElementById('file-upload-name').textContent = 'Imagen inválida';
+                    } else {
+                        document.getElementById('file-upload-name').textContent = fileName;
+                    }
+                    checkAddFormValidity(); // Verificar la validez del formulario
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('file-upload-name').textContent = 'No hay archivo seleccionado';
+            checkAddFormValidity();
+        }
+    }
+
+    // Función para habilitar o deshabilitar el botón de envío
+    function checkAddFormValidity() {
+        const form = document.getElementById('addProductForm');
+        const submitBtn = document.getElementById('addProductBtn');
+        const imageStatus = document.getElementById('file-upload-name').textContent;
+
+        // Habilitar el botón solo si el formulario es válido y la imagen es válida
+        if (form.checkValidity() && imageStatus !== 'Imagen inválida' && imageStatus !== 'No hay archivo seleccionado') {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    }
+
+    // Inicialización: habilitar/deshabilitar el botón al cargar la página
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('addProductForm');
+        form.addEventListener('input', checkAddFormValidity); 
+        checkAddFormValidity(); 
+    });
+
+    function openModal() {
+        $('#productAddedModal').fadeIn(); 
+    }
+
+    // Función para cerrar el modal de confirmación
+    function closeModal() {
+        $('#productAddedModal').fadeOut();
+        location.reload();
+    }
+
+    // Manejar el envío del formulario de agregar producto
+    $('#addProductForm').on('submit', function (event) {
+        event.preventDefault();
+
+        let formData = new FormData(this);
+
+        // Recopila combinaciones de categorías, colores y tallas.
+        document.querySelectorAll('#combinationContainer .combination-row').forEach((row, index) => {
+            formData.append(`CategoryIds[${index}]`, row.querySelector('select[name="CategoryIds"]').value);
+            formData.append(`ColorIds[${index}]`, row.querySelector('select[name="ColorIds"]').value);
+            formData.append(`SizeIds[${index}]`, row.querySelector('select[name="SizeIds"]').value);
+        });
+
+        // Procesa el formulario como de costumbre
+        $.ajax({
+            url: '/Products/Create',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                closeSidebar();
+                openModal();
+
+                let newRow = `
+                    <tr>
+                        <td>${response.productId}</td>
+                        <td><img src="/img/${response.imageUrl}" alt="${response.name}" class="img-fluid"></td>
+                        <td>${response.name}</td>
+                        <td>${response.description}</td>
+                        <td>${response.category}</td>
+                        <td>${response.color}</td>
+                        <td>${response.size}</td>
+                        <td>${response.stock}</td>
+                        <td>${response.price}</td>
+                        <td>${response.state}</td>
+                        <td class="action-icons">
+                            <a href="javascript:void(0);" onclick="openEditSidebar(${response.productId})">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                                   <a href="javascript:void(0);" onclick="openDeleteSidebar(${response.productId})">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                        </td>
+                    </tr>
+                `;
+                $('table tbody').append(newRow);
+            },
+            error: function (xhr, status, error) {
+                console.log('Error al agregar el producto: ', error);
+            }
+        });
+    });
+
+
+        // Función para cerrar el sidebar
+        function closeSidebar() {
+            $('#addProductSidebar').removeClass('sidebar-open'); 
+        }
+
+        // Cerrar el modal cuando se hace clic en el botón de "Aceptar"
+        $('#confirmBtn').on('click', function () {
+            closeModal();
+        });
+
+    $(document).ready(function () {
+        // Cambiar el texto de los valores true/false a Activo/Inactivo
+        $('select[name="StateId"] option').each(function () {
+            if ($(this).val() === 'true') {
+                $(this).text('Activo');
+            } else if ($(this).val() === 'false') {
+                $(this).text('Inactivo');
+            }
+        });
+    });
+</script>
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

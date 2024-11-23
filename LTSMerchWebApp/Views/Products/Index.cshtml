@@ -1,0 +1,134 @@
+﻿@model IEnumerable<LTSMerchWebApp.Models.Product>
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="~/css/ProductsIndex.css"> 
+    <link rel="stylesheet" href="~/css/SidebarModalAdd.css">
+
+</head>
+
+<div class="container mt-5">
+    <h2 class="product-title">PRODUCTOS</h2>
+    <div class="table-wrapper">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Imagen del producto</th>
+                        <th>Nombre del producto</th>
+                        <th>Descripción del producto</th>
+                        <th>Categoría</th>
+                        <th>Color</th>
+                        <th>Talla</th>
+                        <th>Stock</th>
+                        <th>Precio unitario</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        <tr data-product-id="@product.ProductId">
+                            <td>@product.ProductId</td>
+                            <td>
+                                <img src="~/img/@product.ImageUrl" alt="@product.Name" class="img-fluid">
+                            </td>
+                            <td>@product.Name</td>
+                            <td>@product.Description</td>
+                            <td>
+                                
+                                @foreach (var option in product.ProductOptions)
+                                {
+                                    @option.Category?.Description <br />
+                                }
+                            </td>
+                            <td>
+                                
+                                @foreach (var option in product.ProductOptions)
+                                {
+                                    @option.Color?.ColorName <br />
+                                }
+                            </td>
+                            <td>
+                                
+                                @foreach (var option in product.ProductOptions)
+                                {
+                                    @option.Size?.SizeName <br />
+                                }
+                            </td>
+                            <td>@product.Stock</td> 
+                            <td>@product.Price.ToString("F2")</td>
+                            <td>
+                               
+                                @foreach (var option in product.ProductOptions)
+                                {
+                                    @if (option.State != null)
+                                    {
+                                        @(option.State.IsActive == true ? "Activo" : "Inactivo") <br />
+                                    }
+                                }
+                            </td>
+                            <td class="action-icons">
+                                <a href="javascript:void(0);" onclick="openEditSidebar(@product.ProductId)">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a href="javascript:void(0);" onclick="openDeleteSidebar('@product.ProductId', '@product.Name', '@product.ImageUrl')">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+ 
+    <div class="button-container">
+        <button type="button" class="add-product-btn" onclick="openSidebar()">
+            AGREGAR PRODUCTO
+        </button>
+    </div>
+</div>
+
+@Html.Partial("_AddProductSidebar", new LTSMerchWebApp.Models.Product())
+@Html.Partial("_EditProductSidebar", new LTSMerchWebApp.Models.Product())
+@Html.Partial("_DeleteProductSidebar", new LTSMerchWebApp.Models.Product())
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function openSidebar() {
+            $('#addProductForm')[0].reset();
+            document.getElementById("file-upload-name").textContent = 'No hay archivo seleccionado';
+
+            document.getElementById("addProductSidebar").classList.add("sidebar-open");
+        }
+
+        function closeSidebar() {
+            document.getElementById("addProductSidebar").classList.remove("sidebar-open");
+        }
+
+        function openDeleteSidebar(productId, productName, imageUrl) {
+            console.log("ID del producto:", productId); // Depuración
+
+            // Actualizar el ID del producto en el campo oculto
+            document.getElementById("productId").value = productId;
+
+            // Actualizar la imagen y el nombre del producto en el modal
+            document.querySelector("#deleteProductSidebar .product-image").src = `/img/${imageUrl}`;
+            document.querySelector("#deleteProductSidebar .product-name").textContent = productName;
+
+            // Abre el sidebar de eliminar
+            document.getElementById("deleteProductSidebar").classList.add("sidebar-open");
+        }
+
+
+                function closeDeletedSidebar() {
+                    document.getElementById("deleteProductSidebar").classList.remove("sidebar-open");
+                }
+    </script>
+}

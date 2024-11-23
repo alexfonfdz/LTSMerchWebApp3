@@ -1,0 +1,102 @@
+﻿@model IEnumerable<LTSMerchWebApp.Models.Size>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<link href="~/css/StylesSizesIndex.css" rel="stylesheet">
+<link href="~/css/StylesSizesSidebar.css" rel="stylesheet">
+
+<body>
+
+    <h1>Tallas</h1>
+
+    <table class="TableQuerys">
+        <thead>
+
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.SizeId)
+                </th>
+                <th>
+                    Nombre del producto
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.SizeName)
+                </th>
+                <th>
+                    Stock
+                </th>
+                <th>
+                    Acciones
+                </th>
+            </tr>
+
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SizeId)
+                    </td>
+                    <td>Producto 1</td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SizeName)
+                    </td>
+                    <td>
+                        Cantidad Disponible
+                    </td>
+                    <td>
+                        <button onclick="openSidebar('edit', @item.SizeId)">Edit</button>
+                        <button onclick="openSidebar('delete', @item.SizeId)">Delete</button>
+                    </td>
+                </tr>
+            }
+
+            <tr class="no-border">
+                <td colspan="4"></td>
+                <td style="text-align: center;">
+                    <button class="btnCreate" onclick="openSidebar('create')">Agregar talla</button>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <span class="closebtn" onclick="closeSidebar()">&times;</span>
+        <div id="sidebar-content">
+            <!-- Aquí se cargará el contenido de las vistas -->
+        </div>
+    </div>
+
+    <script>
+        function openSidebar(action, id) {
+            let url = '';
+            if (action === 'create') {
+                url = '@Url.Action("Create", "Sizes")';
+            } else if (action === 'edit') {
+                url = '@Url.Action("Edit", "Sizes")/' + id;
+            } else if (action === 'delete') {
+                url = '@Url.Action("Delete", "Sizes")/' + id;
+            }
+
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('sidebar-content').innerHTML = html;
+                    document.getElementById('sidebar').style.width = "300px"; // Asegúrate de que el sidebar se muestre
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+
+        function closeSidebar() {
+            document.getElementById('sidebar').style.width = "0"; // Cerrar el sidebar
+        }
+    </script>
+
+</body>

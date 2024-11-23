@@ -1,0 +1,26 @@
+﻿@model LTSMerchWebApp.Models.Size
+<link href="~/css/StylesSizesSidebar.css" rel="stylesheet">
+
+<div class="delete-sidebar">
+    <div class="sidepanel-header">
+        <span class="closebtn" onclick="closeSidebar()">&times;</span>
+        <h2>Eliminar</h2>
+        <hr class="header-line">
+    </div>
+
+    <div class="sidepanel-form">
+        <h3>¿Estás seguro de que deseas eliminar este tamaño?</h3>
+
+        <dl class="TallaName">
+            <dd class="sidepanel-details-value">
+                @Html.DisplayFor(model => model.SizeName)
+            </dd>
+        </dl>
+
+         <form asp-action="Delete" class="ButtonGroup">
+            <input type="hidden" asp-for="SizeId" />
+            <a asp-action="Index" class="CancelarButton">Cancelar</a>
+            <input type="submit" value="Eliminar" class="DeleteButton" />
+        </form>
+    </div>
+</div>

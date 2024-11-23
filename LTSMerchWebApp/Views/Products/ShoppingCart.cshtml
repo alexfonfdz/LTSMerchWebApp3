@@ -1,0 +1,82 @@
+﻿@model LTSMerchWebApp.Models.Cart
+
+<style>
+    body {
+        background-color: #000000;
+        color: #FFFFFF;
+        font-family: 'Inter', sans-serif;
+        text-transform: uppercase;
+    }
+</style>
+<body>
+    <div class="container">
+        <div class="cart-header">
+            <h1>Tu Carrito</h1>
+            <button class="close-button" onclick="window.location.href='/'" style="background: none; border: none; color: #FFF; font-size: 1.5em;">&times;</button>
+        </div>
+
+        @if (Model?.CartItems != null && Model.CartItems.Any())
+        {
+            foreach (var item in Model.CartItems)
+            {
+                if (item?.ProductOption?.Product != null)
+                {
+                    <div class="cart-item">
+                        <img src="~/img/@item.ProductOption.Product.ImageUrl" alt="@item.ProductOption.Product.Name" class="img-fluid" style="max-width: 150px;">
+                        <div class="cart-item-info">
+                            <p class="cart-item-title">@item.ProductOption.Product.Name</p>
+                            <p class="cart-item-price">$@item.ProductOption.Product.Price</p>
+                            <p class="cart-item-details">
+                                @item.Quantity unidad(es) |
+                                @(item.ProductOption.Size != null ? item.ProductOption.Size.SizeName : "Sin talla") |
+                                @(item.ProductOption.Color != null ? item.ProductOption.Color.ColorName : "Sin color")
+                            </p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <!-- Botón de editar cantidad -->
+                            <form method="post" action="@Url.Action("UpdateCartItem")" style="display: inline;">
+                                <input type="hidden" name="cartItemId" value="@item.CartItemId" />
+                                <input type="number" name="quantity" value="@item.Quantity" min="1" required style="width: 50px;" />
+                                <button type="submit" class="btn btn-link">
+                                    <img src="~/img/edit.png" alt="Edit">
+                                </button>
+                            </form>
+                            <!-- Botón de eliminar -->
+                            <form method="post" action="@Url.Action("RemoveCartItem")" style="display: inline;">
+                                <input type="hidden" name="cartItemId" value="@item.CartItemId" />
+                                <button type="submit" class="btn btn-link">
+                                    <img src="~/img/delete.png" alt="Delete">
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p>Item no disponible.</p>
+                }
+            }
+        }
+        else
+        {
+            <p>El carrito está vacío.</p>
+        }
+
+        <div class="cart-summary">
+            <p>Subtotal <span>$@Model.CartItems.Sum(i => i.ProductOption.Product.Price * i.Quantity)</span></p>
+            <!--<p>Gastos de Envío <span>$XX.XX</span></p> -->
+            <div class="cart-total">
+                <span>Total</span>
+                <span>$@Model.CartItems.Sum(i => i.ProductOption.Product.Price * i.Quantity)</span>
+            </div>
+        </div>
+
+        <button class="btn-checkout"
+                onclick="window.location.href='@Url.Action("CheckOutShipping", "Products")'"
+        @(Model?.CartItems == null || !Model.CartItems.Any() ? "disabled" : "")>
+            Pagar
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>

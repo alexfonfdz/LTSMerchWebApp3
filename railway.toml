@@ -1,0 +1,8 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "./LTSMerchWebApp/Dockerfile"
+
+[deploy]
+startCommand = "dotnet ./LTSMerchWebApp.dll"
+restartPolicyType = "always"
+healthCheckPath = "/health"
