@@ -11,11 +11,11 @@
 using System;
 using System.Reflection;
 
-[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("14452b3b-45d7-4d5b-bb7c-3c351f94cdc7")]
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("26b78396-2ff5-4fa3-bc7f-fe9b6dfc7fc1")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("LTSMerchWebApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+923c3f91e68a57e317f4cb90727553596ef517ae")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9c3acb38f5829b4b942a90d1248886cca666da06")]
 [assembly: System.Reflection.AssemblyProductAttribute("LTSMerchWebApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LTSMerchWebApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
